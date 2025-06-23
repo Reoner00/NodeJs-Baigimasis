@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 import TicketModel from "./ticketModel.js";
-import UserModel from "../user/UserModel.js";
 
 export const INSERT_TICKET = async (req, res) => {
   try {
@@ -9,61 +8,53 @@ export const INSERT_TICKET = async (req, res) => {
       id: uuidv4(),
     };
 
-    const response = new TicketModel(data);
-    const ticket = await response.save();
+    const ticket = new TicketModel(data);
+    await ticket.save();
 
     res.status(201).json({
-      message: "Ticket inserted.",
+      message: "Ticket inserted successfully",
       ticket: ticket,
+      created_by: req.user.userId,
     });
   } catch (error) {
-    res.status(500).json({ message: "There are issues", error: error });
+    console.log("INSERT_TICKET Error:", error);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
-export const BUY_TICKET = async (req, res) => {
+export const GET_ALL_TICKETS = async (req, res) => {
   try {
-    const { user_id, ticket_id } = req.body;
-    if (!user_id || !ticket_id) {
-      return res.status(400).json({
-        message: "User id and Ticket id required",
-      });
-    }
+    const tickets = await TicketModel.find({}).sort({ title: 1 });
 
-    const user = await UserModel.findOne({ id: user_id });
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    const ticket = await TicketModel.findOne({ id: ticket_id });
-    if (!ticket) {
-      return res.status(404).json({
-        message: "Ticket with such id not found.",
-      });
-    }
-
-    if (user.money_balance < ticket.ticket_price) {
-      return res.status(400).json({
-        message: "User does not have enough money for ticket",
-      });
-    }
-
-    const updatedUser = await UserModel.findOneAndUpdate(
-      { id: user_id },
-      {
-        $push: { bought_tickets: ticket_id },
-        $inc: { money_balance: -ticket.ticket_price },
-      },
-      { new: true }
-    );
-
-    return res.status(200).json({
-      message: "Ticket successfully bought",
-      user: updatedUser,
+    res.status(200).json({
+      message: "All tickets retrieved successfully",
+      total_tickets: tickets.length,
+      tickets: tickets,
     });
   } catch (error) {
-    res.status(500).json({ message: "There are issues", error: error });
+    console.log("GET_ALL_TICKETS Error:", error);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+// ✅ Функция для получения билета по ID
+export const GET_TICKET_BY_ID = async (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    const ticket = await TicketModel.findOne({ id: ticketId });
+
+    if (!ticket) {
+      return res.status(404).json({
+        message: "Ticket not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Ticket retrieved successfully",
+      ticket: ticket,
+    });
+  } catch (error) {
+    console.log("GET_TICKET_BY_ID Error:", error);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };

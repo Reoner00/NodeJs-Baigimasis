@@ -6,8 +6,8 @@ export const userRegisterSchema = Joi.object({
   password: Joi.string()
     .required()
     .pattern(/^(?=.*\d).{6,}$/),
-  money_balance: Joi.number(),
-  bought_tickets: Joi.array().items(Joi.string()),
+  money_balance: Joi.number().default(0),
+  bought_tickets: Joi.array().items(Joi.string()).default([]),
 });
 
 export const userLoginSchema = Joi.object({
@@ -16,5 +16,9 @@ export const userLoginSchema = Joi.object({
 });
 
 export const tokenSchema = Joi.object({
-  token: Joi.string().required(),
+  jwt_refresh_token: Joi.string().required(),
+});
+
+export const buyTicketSchema = Joi.object({
+  ticket_id: Joi.string().required(),
 });

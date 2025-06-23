@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const ticketSchema = mongoose.Schema({
-  id: { type: String, required: true },
+  id: { type: String, required: true, unique: true },
   title: { type: String, required: true },
   ticket_price: { type: Number, required: true },
   from_location: { type: String, required: true },
@@ -9,4 +9,7 @@ const ticketSchema = mongoose.Schema({
   to_location_photo_url: { type: String, required: true },
 });
 
-export default mongoose.model("Ticket", ticketSchema);
+const TicketModel =
+  mongoose.models.Ticket || mongoose.model("Ticket", ticketSchema);
+
+export default TicketModel;
