@@ -37,7 +37,6 @@ export const GET_ALL_TICKETS = async (req, res) => {
   }
 };
 
-// ✅ Функция для получения билета по ID
 export const GET_TICKET_BY_ID = async (req, res) => {
   try {
     const ticketId = req.params.id;

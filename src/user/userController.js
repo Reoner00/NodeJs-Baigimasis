@@ -48,7 +48,10 @@ export const REGISTER_USER = async (req, res) => {
     });
   } catch (err) {
     console.log("REGISTER_USER Error:", err);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(400).json({
+      message:
+        "Email address is already registered. Please use a different email.",
+    });
   }
 };
 
@@ -92,7 +95,7 @@ export const LOGIN_USER = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({
-      message: "Something went wrong",
+      message: "Login failed due to server error. Please try again later.",
     });
   }
 };
@@ -152,7 +155,7 @@ export const ALL_USERS = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({
-      message: "Something went wrong",
+      message: "Failed to retrieve users. Please try again later.",
     });
   }
 };
@@ -177,7 +180,7 @@ export const USER_BY_ID = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({
-      message: "Something went wrong",
+      message: "Failed to retrieve user information. Please try again later.",
     });
   }
 };
@@ -223,7 +226,7 @@ export const BUY_TICKET = async (req, res) => {
         $push: { bought_tickets: ticket_id },
         $inc: { money_balance: -ticket.ticket_price },
       },
-      { new: true, select: "-password" } // Не возвращаем пароль
+      { new: true, select: "-password" }
     );
 
     res.status(200).json({
@@ -252,10 +255,9 @@ export const BUY_TICKET = async (req, res) => {
 export const USERS_WITH_TICKETS = async (req, res) => {
   try {
     const users = await UserModel.aggregate([
-      // ✅ Фильтруем только пользователей с билетами
       {
         $match: {
-          $expr: { $gt: [{ $size: "$bought_tickets" }, 0] }, // Только те, у кого есть билеты
+          $expr: { $gt: [{ $size: "$bought_tickets" }, 0] },
         },
       },
       {
@@ -273,7 +275,7 @@ export const USERS_WITH_TICKETS = async (req, res) => {
         },
       },
       {
-        $sort: { name: 1 }, // Сортировка по имени
+        $sort: { name: 1 },
       },
     ]);
 
@@ -375,6 +377,8 @@ export const GET_MY_TICKETS = async (req, res) => {
     });
   } catch (err) {
     console.log("GET_MY_TICKETS Error:", err);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({
+      message: "Failed to retrieve your tickets. Please try again later.",
+    });
   }
 };

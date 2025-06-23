@@ -21,16 +21,13 @@ import { auth } from "../middlewares/auth.js";
 
 export const usersRouter = express.Router();
 
-// Публичные роуты (без авторизации)
 usersRouter.post("/signUp", validation(userRegisterSchema), REGISTER_USER);
 usersRouter.post("/login", validation(userLoginSchema), LOGIN_USER);
 usersRouter.post("/getNewJwtToken", validation(tokenSchema), NEW_JWT_TOKEN);
 
-// Роуты для пользователей (с авторизацией)
-usersRouter.get("/my-tickets", auth, GET_MY_TICKETS); // Мои билеты
-usersRouter.post("/buyTicket", auth, validation(buyTicketSchema), BUY_TICKET); // Купить билет
+usersRouter.get("/my-tickets", auth, GET_MY_TICKETS);
+usersRouter.post("/buyTicket", auth, validation(buyTicketSchema), BUY_TICKET);
 
-// Роуты для админов (с авторизацией)
 usersRouter.get("/getAllUsers", auth, ALL_USERS);
 usersRouter.get("/getUserById/:id", auth, USER_BY_ID);
 usersRouter.get("/getAllUsersWithTickets", auth, USERS_WITH_TICKETS);
